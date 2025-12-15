@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Love at First Bite 🍔❤️</title>
+    <style>
+        @font-face {
+            font-family: 'Yahoo Product Sans';
+            src: url('YahooProductSans-VF_CONFIDENTIAL.ttf') format('truetype');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Demo wrapper to show overlay context */
+        .demo-wrapper {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .demo-logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 16px;
+        }
+        
+        .demo-title {
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            font-size: 76px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            white-space: nowrap;
+            text-align: center;
+        }
+        
+        .demo-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+        
+        .location-hint {
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            font-size: 12px;
+            color: #999;
+            margin-top: 12px;
+            transition: color 0.2s;
+        }
+        
+        .location-hint.enabled {
+            color: #006C3B;
+        }
+        
+        .dining-options {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+        }
+        
+        .dining-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            font-size: 16px;
+            font-weight: 450;
+            line-height: 17.6px;
+            color: #141414;
+            height: 44px;
+        }
+        
+        .dining-option input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background: #fcfbfb;
+            border: 1px solid #e0e4e9;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+        
+        .dining-option input[type="checkbox"]:checked {
+            background: #7d2eff;
+            border-color: transparent;
+        }
+        
+        .dining-option input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 5.5px;
+            top: 3px;
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        .dining-option .required {
+            color: #141414;
+            font-weight: 500;
+        }
+        
+        .open-overlay-btn {
+            background: #0F69FF;
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 30px;
+            font-family: 'Yahoo Product Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .open-overlay-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .open-overlay-btn:active {
+            transform: translateY(0);
+        }
+        
+        .open-overlay-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* ========================================
+           LOVE AT FIRST BITE OVERLAY STYLES
+           ======================================== */
+        
+        .love-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 5000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .love-overlay.hidden {
+            display: none !important;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .love-screen {
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            max-height: 750px;
+            background: #ffffff;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes slideUp {
+            from { 
+                transform: translateY(50px) scale(0.95);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .love-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .radius-dropdown select {
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            padding: 10px 36px 10px 14px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            color: #333;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .radius-dropdown select:hover {
+            border-color: #6366f1;
+        }
+        
+        .radius-dropdown select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        
+        .love-close-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 50%;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        
+        .love-close-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .love-close-btn:hover {
+            background: #e0e0e0;
+            color: #333;
+            transform: rotate(90deg);
+        }
+        
+        .love-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 24px;
+            overflow-y: auto;
+        }
+        
+        .love-title {
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            font-size: 28px;
+            font-weight: 400;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+            text-align: center;
+        }
+        
+        .love-subtitle {
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin: 0 0 24px 0;
+            line-height: 1.5;
+            max-width: 300px;
+        }
+        
+        .swipe-card-container {
+            width: 100%;
+            max-width: 340px;
+            flex: 1;
+            min-height: 0;
+            max-height: 400px;
+            perspective: 1000px;
+            margin-bottom: 16px;
+        }
+        
+        .swipe-card {
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: grab;
+            user-select: none;
+            background: #f0f0f0;
+        }
+        
+        .swipe-card:active {
+            cursor: grabbing;
+        }
+        
+        .swipe-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .swipe-card.swiped-right {
+            animation: swipeRight 0.4s forwards;
+        }
+        
+        .swipe-card.swiped-left {
+            animation: swipeLeft 0.4s forwards;
+        }
+        
+        @keyframes swipeRight {
+            to {
+                transform: translateX(150%) rotate(30deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes swipeLeft {
+            to {
+                transform: translateX(-150%) rotate(-30deg);
+                opacity: 0;
+            }
+        }
+        
+        .swipe-buttons {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .swipe-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .swipe-btn svg {
+            width: 28px;
+            height: 28px;
+        }
+        
+        .like-btn {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+        }
+        
+        .like-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 24px rgba(34, 197, 94, 0.4);
+        }
+        
+        .like-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .dislike-btn {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            color: white;
+        }
+        
+        .dislike-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 24px rgba(244, 63, 94, 0.4);
+        }
+        
+        .dislike-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .love-footer {
+            padding: 16px;
+            text-align: center;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .love-footer svg {
+            height: 20px;
+            width: auto;
+        }
+        
+        .footer-progress-container {
+            width: 100%;
+            max-width: 362px;
+            height: 8px;
+            background: #D9D9D9;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .footer-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #7D2EFF;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Match Screen Styles */
+        .match-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 20px;
+            overflow-y: auto;
+        }
+        
+        .match-title {
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            font-size: 26px;
+            font-weight: 400;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+            text-align: center;
+        }
+        
+        .match-subtitle {
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+        
+        .restaurant-card {
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+        }
+        
+        .restaurant-name {
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            font-size: 24px;
+            font-weight: 400;
+            color: #1a1a1a;
+            margin: 0 0 4px 0;
+        }
+        
+        .restaurant-type {
+            font-size: 14px;
+            color: #666;
+            margin: 0 0 16px 0;
+        }
+        
+        .restaurant-images {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .main-image {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .side-images {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .side-images img {
+            flex: 1;
+            border-radius: 8px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .map-preview {
+            flex: 1;
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4edda 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .map-preview::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: 
+                linear-gradient(90deg, transparent 49%, #ccc 49%, #ccc 51%, transparent 51%),
+                linear-gradient(0deg, transparent 49%, #ccc 49%, #ccc 51%, transparent 51%);
+            background-size: 30px 30px;
+            opacity: 0.3;
+        }
+        
+        .map-pin {
+            width: 28px;
+            height: auto;
+            z-index: 1;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .restaurant-info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .info-box {
+            background: #F5F5F5;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .info-label {
+            font-size: 16px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-size: 15px;
+            color: #1a1a1a;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .info-value.open {
+            color: #006C3B;
+            font-weight: 500;
+        }
+        
+        .yelp-icon {
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .yelp-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .info-detail {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .overview-section {
+            background: #F5F5F5;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .overview-header {
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .overview-header:hover {
+            background: #f9fafb;
+        }
+        
+        .chevron {
+            font-size: 10px;
+            color: #888;
+            transition: transform 0.2s;
+            display: none;
+        }
+        
+        .overview-section.needs-expansion .chevron {
+            display: inline;
+        }
+        
+        .overview-section.expanded .chevron {
+            transform: rotate(180deg);
+        }
+        
+        .overview-section:not(.needs-expansion) .overview-header {
+            cursor: default;
+        }
+        
+        .overview-section:not(.needs-expansion) .overview-header:hover {
+            background: transparent;
+        }
+        
+        .overview-text {
+            padding: 0 16px 14px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .match-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+            padding-top: 16px;
+        }
+        
+        .primary-btn {
+            flex: 1;
+            padding: 14px 24px;
+            background: #0F69FF;
+            color: white;
+            border: none;
+            border-radius: 28px;
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .primary-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .secondary-btn {
+            flex: 1;
+            padding: 14px 24px;
+            background: white;
+            color: #1a1a1a;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 28px;
+            font-family: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .secondary-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .love-screen {
+                max-width: 100%;
+                max-height: 100%;
+                border-radius: 0;
+            }
+            
+            .swipe-card-container {
+                max-width: 300px;
+                max-height: 350px;
+            }
+            
+            body {
+                align-items: flex-start;
+                padding-top: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo wrapper -->
+    <div class="demo-wrapper">
+        <img src="loveatfirstbite.svg" alt="Love at First Bite" class="demo-logo">
+        <h1 class="demo-title">Love at First Bite</h1>
+        <p class="demo-subtitle">Discover restaurants by swiping through delicious food photos. Find your perfect match!</p>
+        
+        <div class="dining-options">
+            <label class="dining-option">
+                <input type="checkbox" id="delivery-option" checked>
+                Delivery/Takeout
+            </label>
+            <label class="dining-option">
+                <input type="checkbox" id="dineout-option" checked>
+                Dining Out
+            </label>
+        </div>
+        
+        <button id="main-btn" class="open-overlay-btn" onclick="handleMainButtonClick()">Enable Location</button>
+        <p id="location-hint" class="location-hint">Precise location must be enabled to ensure accurate results, sharing your location is secure</p>
+    </div>
+
+    <!-- Love at First Bite Overlay -->
+    <div id="love-overlay" class="love-overlay hidden">
+        <!-- Swipe Screen -->
+        <div id="swipe-screen" class="love-screen">
+            <div class="love-header">
+                <div class="radius-dropdown">
+                    <select id="radius-select">
+                        <option value="1">Results within 1 mi</option>
+                        <option value="2">Results within 2 mi</option>
+                        <option value="5">Results within 5 mi</option>
+                        <option value="10">Results within 10 mi</option>
+                    </select>
+                </div>
+                <button class="love-close-btn" onclick="closeLoveOverlay()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 13.7678L18.3373 20.105L20.1051 18.3373L13.7678 12L20.1051 5.66274L18.3373 3.89498L12 10.2322L5.66273 3.89492L3.89496 5.66269L10.2323 12L3.89496 18.3373L5.66273 20.1051L12 13.7678Z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="love-content">
+                <h1 class="love-title">Love at first bite</h1>
+                <p class="love-subtitle">Rate the images below and get suggestions for places near you to match your cravings.</p>
+                
+                <div class="swipe-card-container">
+                    <div id="swipe-card" class="swipe-card">
+                        <img id="food-image" src="" alt="Food image">
+                    </div>
+                </div>
+                
+                <div class="swipe-buttons">
+                    <button class="swipe-btn like-btn" onclick="handleLike()">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    </button>
+                    <button class="swipe-btn dislike-btn" onclick="handleDislike()">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    </button>
+                </div>
+                
+                </div>
+            
+            <div class="love-footer">
+                <div class="footer-progress-container">
+                    <div id="footer-progress-bar" class="footer-progress-bar"></div>
+                </div>
+                <svg width="87" height="24" viewBox="0 0 87 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M25.0661 5.86703V7.1099C24.3499 6.18452 23.0238 5.55223 21.488 5.55223C17.8581 5.55223 15.154 8.74625 15.154 12.4966C15.154 16.3501 17.8308 19.441 21.488 19.441C23.0238 19.441 24.3499 18.8331 25.0661 17.8562V19.0963H29.5946V5.86703H25.0661ZM31.1577 0.00539959V19.0963H35.8496V12.0407C35.8496 10.6676 36.5113 9.85073 37.5706 9.85073C38.6298 9.85073 39.1881 10.5617 39.1881 11.8833V19.0909H43.8772V10.7734C43.8772 7.55223 42.129 5.5468 39.3188 5.5468C38.6501 5.52267 37.9852 5.65577 37.3777 5.93534C36.7703 6.21491 36.2374 6.63311 35.8223 7.15604V0L31.1577 0.00539959ZM74.0573 12.4884C74.0573 16.4477 71.0102 19.4328 66.9555 19.4328C62.9008 19.4328 59.8536 16.4477 59.8536 12.4884C59.8536 8.52915 62.9008 5.54408 66.9555 5.54408C71.0102 5.54408 74.0573 8.52915 74.0573 12.4884ZM59.0585 12.4884C59.0585 16.4477 56.0114 19.4328 51.9594 19.4328C47.9074 19.4328 44.8576 16.4477 44.8576 12.4884C44.8576 8.52915 47.9047 5.54408 51.9594 5.54408C56.0141 5.54408 59.0585 8.52915 59.0585 12.4884ZM0 5.85888L5.66949 19.194L3.62988 24H8.61043L16.1616 5.85888H11.2083L8.13389 13.6201L5.08674 5.85617L0 5.85888ZM22.441 15.2076C22.0798 15.2152 21.7207 15.1505 21.385 15.0172C21.0494 14.884 20.744 14.6849 20.487 14.4318C20.2299 14.1787 20.0266 13.8768 19.8888 13.5439C19.7511 13.211 19.6819 12.8539 19.6853 12.4939C19.6815 12.1337 19.7505 11.7765 19.8881 11.4434C20.0257 11.1103 20.229 10.8083 20.4861 10.5551C20.7432 10.3019 21.0488 10.1029 21.3846 9.96976C21.7204 9.83663 22.0797 9.77215 22.441 9.78017C22.7999 9.7758 23.1559 9.84301 23.4883 9.97784C23.8206 10.1127 24.1226 10.3124 24.3763 10.5653C24.6301 10.8181 24.8305 11.119 24.9658 11.4502C25.1011 11.7815 25.1685 12.1363 25.1641 12.4939C25.1685 12.8515 25.1011 13.2063 24.9658 13.5375C24.8305 13.8687 24.6301 14.1696 24.3763 14.4225C24.1226 14.6754 23.8206 14.8751 23.4883 15.0099C23.1559 15.1447 22.7999 15.212 22.441 15.2076ZM54.609 12.4939C54.6174 12.1436 54.5549 11.7951 54.4251 11.4695C54.2953 11.1438 54.1008 10.8476 53.8535 10.5985C53.6061 10.3495 53.3109 10.1527 52.9854 10.02C52.66 9.88735 52.311 9.82147 51.9594 9.82632C51.6078 9.82147 51.2588 9.88735 50.9334 10.02C50.6079 10.1527 50.3127 10.3495 50.0653 10.5985C49.8179 10.8476 49.6235 11.1438 49.4937 11.4695C49.3639 11.7951 49.3014 12.1436 49.3098 12.4939C49.3013 12.8441 49.3639 13.1924 49.4938 13.5179C49.6236 13.8434 49.8181 14.1395 50.0655 14.3883C50.3129 14.6371 50.6081 14.8336 50.9336 14.966C51.259 15.0984 51.6079 15.164 51.9594 15.1588C52.3109 15.164 52.6598 15.0984 52.9852 14.966C53.3106 14.8336 53.6059 14.6371 53.8533 14.3883C54.1007 14.1395 54.2952 13.8434 54.425 13.5179C54.5549 13.1924 54.6174 12.8441 54.609 12.4939ZM69.6051 12.4939C69.6135 12.1436 69.551 11.7951 69.4212 11.4695C69.2913 11.1438 69.0969 10.8476 68.8496 10.5985C68.6022 10.3495 68.307 10.1527 67.9815 10.02C67.6561 9.88735 67.3071 9.82147 66.9555 9.82632C66.6039 9.82147 66.2549 9.88735 65.9295 10.02C65.604 10.1527 65.3088 10.3495 65.0614 10.5985C64.814 10.8476 64.6196 11.1438 64.4898 11.4695C64.36 11.7951 64.2975 12.1436 64.3059 12.4939C64.2974 12.8441 64.36 13.1924 64.4899 13.5179C64.6197 13.8434 64.8141 14.1395 65.0616 14.3883C65.309 14.6371 65.6042 14.8336 65.9297 14.966C66.2551 15.0984 66.604 15.164 66.9555 15.1588C67.3069 15.164 67.6559 15.0984 67.9813 14.966C68.3067 14.8336 68.602 14.6371 68.8494 14.3883C69.0968 14.1395 69.2913 13.8434 69.4211 13.5179C69.551 13.1924 69.6135 12.8441 69.6051 12.4939ZM74.6401 16.2931C74.6346 16.6934 74.7095 17.0908 74.8605 17.4618C75.0115 17.8328 75.2354 18.1699 75.5191 18.4534C75.8027 18.7369 76.1405 18.9609 76.5124 19.1123C76.8842 19.2638 77.2828 19.3395 77.6845 19.3352C78.0995 19.3384 78.511 19.2593 78.8951 19.1025C79.2791 18.9458 79.628 18.7145 79.9215 18.422C80.215 18.1295 80.4471 17.7818 80.6044 17.3991C80.7618 17.0164 80.8411 16.6062 80.8378 16.1927C80.8448 15.792 80.7708 15.394 80.6202 15.0224C80.4695 14.6508 80.2453 14.3133 79.961 14.0299C79.6766 13.7465 79.3379 13.5231 78.965 13.373C78.5922 13.2228 78.1928 13.1491 77.7907 13.156C77.3762 13.1546 76.9655 13.2349 76.5822 13.3923C76.199 13.5497 75.8508 13.7811 75.5577 14.0732C75.2646 14.3653 75.0324 14.7123 74.8744 15.0942C74.7165 15.4761 74.6359 15.8854 74.6373 16.2985L74.6401 16.2931ZM81.3171 0.0108323L76.3229 11.9919H81.8889L86.8695 0.00268323L81.3171 0.0108323Z" fill="#6001D2"/>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Match Result Screen -->
+        <div id="match-screen" class="love-screen hidden">
+            <div class="love-header">
+                <div></div>
+                <button class="love-close-btn" onclick="closeLoveOverlay()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 13.7678L18.3373 20.105L20.1051 18.3373L13.7678 12L20.1051 5.66274L18.3373 3.89498L12 10.2322L5.66273 3.89492L3.89496 5.66269L10.2323 12L3.89496 18.3373L5.66273 20.1051L12 13.7678Z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="match-content">
+                <h1 class="match-title">You have a match!</h1>
+                <p class="match-subtitle" id="match-message">Based on your likes you're ready for some delicious dining. We saved the rest in your favorites.</p>
+                
+                <div class="restaurant-card">
+                    <h2 class="restaurant-name" id="restaurant-name">Restaurant Name</h2>
+                    <p class="restaurant-type" id="restaurant-type">Restaurant Type • $$</p>
+                    
+                    <div class="restaurant-images">
+                        <div class="main-image">
+                            <img id="restaurant-main-img" src="" alt="Restaurant">
+                        </div>
+                        <div class="side-images">
+                            <img id="restaurant-img-2" src="" alt="Restaurant food">
+                            <div class="map-preview">
+                                <img src=" mappin.svg" alt="Location" class="map-pin">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="restaurant-info-row">
+                        <div class="info-box">
+                            <span class="info-label">Review</span>
+                            <div class="info-value">
+                                <span class="yelp-icon"><img src="yelp.svg" alt="Yelp" width="16" height="16"></span>
+                                <span id="restaurant-rating">4.5</span> on Yelp
+                            </div>
+                            <span class="info-detail" id="restaurant-reviews">200 reviews</span>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-label">Hours</span>
+                            <span class="info-value open" id="restaurant-status">Open</span>
+                            <span class="info-detail" id="restaurant-hours">Closes at 10pm</span>
+                        </div>
+                    </div>
+                    
+                    <div class="overview-section" id="overview-section">
+                        <div class="overview-header" onclick="toggleOverview()">
+                            <span>Overview</span>
+                            <span class="chevron" id="overview-chevron">▼</span>
+                        </div>
+                        <p class="overview-text" id="restaurant-overview">A wonderful local restaurant known for its amazing food and atmosphere.</p>
+                    </div>
+                </div>
+                
+                <div class="match-buttons">
+                    <button class="primary-btn" onclick="goToListing()">Go to listing</button>
+                    <button class="secondary-btn" onclick="keepPlaying()">Keep playing</button>
+                </div>
+            </div>
+            
+            <div class="love-footer">
+                <svg width="87" height="24" viewBox="0 0 87 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M25.0661 5.86703V7.1099C24.3499 6.18452 23.0238 5.55223 21.488 5.55223C17.8581 5.55223 15.154 8.74625 15.154 12.4966C15.154 16.3501 17.8308 19.441 21.488 19.441C23.0238 19.441 24.3499 18.8331 25.0661 17.8562V19.0963H29.5946V5.86703H25.0661ZM31.1577 0.00539959V19.0963H35.8496V12.0407C35.8496 10.6676 36.5113 9.85073 37.5706 9.85073C38.6298 9.85073 39.1881 10.5617 39.1881 11.8833V19.0909H43.8772V10.7734C43.8772 7.55223 42.129 5.5468 39.3188 5.5468C38.6501 5.52267 37.9852 5.65577 37.3777 5.93534C36.7703 6.21491 36.2374 6.63311 35.8223 7.15604V0L31.1577 0.00539959ZM74.0573 12.4884C74.0573 16.4477 71.0102 19.4328 66.9555 19.4328C62.9008 19.4328 59.8536 16.4477 59.8536 12.4884C59.8536 8.52915 62.9008 5.54408 66.9555 5.54408C71.0102 5.54408 74.0573 8.52915 74.0573 12.4884ZM59.0585 12.4884C59.0585 16.4477 56.0114 19.4328 51.9594 19.4328C47.9074 19.4328 44.8576 16.4477 44.8576 12.4884C44.8576 8.52915 47.9047 5.54408 51.9594 5.54408C56.0141 5.54408 59.0585 8.52915 59.0585 12.4884ZM0 5.85888L5.66949 19.194L3.62988 24H8.61043L16.1616 5.85888H11.2083L8.13389 13.6201L5.08674 5.85617L0 5.85888ZM22.441 15.2076C22.0798 15.2152 21.7207 15.1505 21.385 15.0172C21.0494 14.884 20.744 14.6849 20.487 14.4318C20.2299 14.1787 20.0266 13.8768 19.8888 13.5439C19.7511 13.211 19.6819 12.8539 19.6853 12.4939C19.6815 12.1337 19.7505 11.7765 19.8881 11.4434C20.0257 11.1103 20.229 10.8083 20.4861 10.5551C20.7432 10.3019 21.0488 10.1029 21.3846 9.96976C21.7204 9.83663 22.0797 9.77215 22.441 9.78017C22.7999 9.7758 23.1559 9.84301 23.4883 9.97784C23.8206 10.1127 24.1226 10.3124 24.3763 10.5653C24.6301 10.8181 24.8305 11.119 24.9658 11.4502C25.1011 11.7815 25.1685 12.1363 25.1641 12.4939C25.1685 12.8515 25.1011 13.2063 24.9658 13.5375C24.8305 13.8687 24.6301 14.1696 24.3763 14.4225C24.1226 14.6754 23.8206 14.8751 23.4883 15.0099C23.1559 15.1447 22.7999 15.212 22.441 15.2076ZM54.609 12.4939C54.6174 12.1436 54.5549 11.7951 54.4251 11.4695C54.2953 11.1438 54.1008 10.8476 53.8535 10.5985C53.6061 10.3495 53.3109 10.1527 52.9854 10.02C52.66 9.88735 52.311 9.82147 51.9594 9.82632C51.6078 9.82147 51.2588 9.88735 50.9334 10.02C50.6079 10.1527 50.3127 10.3495 50.0653 10.5985C49.8179 10.8476 49.6235 11.1438 49.4937 11.4695C49.3639 11.7951 49.3014 12.1436 49.3098 12.4939C49.3013 12.8441 49.3639 13.1924 49.4938 13.5179C49.6236 13.8434 49.8181 14.1395 50.0655 14.3883C50.3129 14.6371 50.6081 14.8336 50.9336 14.966C51.259 15.0984 51.6079 15.164 51.9594 15.1588C52.3109 15.164 52.6598 15.0984 52.9852 14.966C53.3106 14.8336 53.6059 14.6371 53.8533 14.3883C54.1007 14.1395 54.2952 13.8434 54.425 13.5179C54.5549 13.1924 54.6174 12.8441 54.609 12.4939ZM69.6051 12.4939C69.6135 12.1436 69.551 11.7951 69.4212 11.4695C69.2913 11.1438 69.0969 10.8476 68.8496 10.5985C68.6022 10.3495 68.307 10.1527 67.9815 10.02C67.6561 9.88735 67.3071 9.82147 66.9555 9.82632C66.6039 9.82147 66.2549 9.88735 65.9295 10.02C65.604 10.1527 65.3088 10.3495 65.0614 10.5985C64.814 10.8476 64.6196 11.1438 64.4898 11.4695C64.36 11.7951 64.2975 12.1436 64.3059 12.4939C64.2974 12.8441 64.36 13.1924 64.4899 13.5179C64.6197 13.8434 64.8141 14.1395 65.0616 14.3883C65.309 14.6371 65.6042 14.8336 65.9297 14.966C66.2551 15.0984 66.604 15.164 66.9555 15.1588C67.3069 15.164 67.6559 15.0984 67.9813 14.966C68.3067 14.8336 68.602 14.6371 68.8494 14.3883C69.0968 14.1395 69.2913 13.8434 69.4211 13.5179C69.551 13.1924 69.6135 12.8441 69.6051 12.4939ZM74.6401 16.2931C74.6346 16.6934 74.7095 17.0908 74.8605 17.4618C75.0115 17.8328 75.2354 18.1699 75.5191 18.4534C75.8027 18.7369 76.1405 18.9609 76.5124 19.1123C76.8842 19.2638 77.2828 19.3395 77.6845 19.3352C78.0995 19.3384 78.511 19.2593 78.8951 19.1025C79.2791 18.9458 79.628 18.7145 79.9215 18.422C80.215 18.1295 80.4471 17.7818 80.6044 17.3991C80.7618 17.0164 80.8411 16.6062 80.8378 16.1927C80.8448 15.792 80.7708 15.394 80.6202 15.0224C80.4695 14.6508 80.2453 14.3133 79.961 14.0299C79.6766 13.7465 79.3379 13.5231 78.965 13.373C78.5922 13.2228 78.1928 13.1491 77.7907 13.156C77.3762 13.1546 76.9655 13.2349 76.5822 13.3923C76.199 13.5497 75.8508 13.7811 75.5577 14.0732C75.2646 14.3653 75.0324 14.7123 74.8744 15.0942C74.7165 15.4761 74.6359 15.8854 74.6373 16.2985L74.6401 16.2931ZM81.3171 0.0108323L76.3229 11.9919H81.8889L86.8695 0.00268323L81.3171 0.0108323Z" fill="#6001D2"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // User location state
+        let userLocation = {
+            latitude: null,
+            longitude: null,
+            granted: false
+        };
+        
+        // DOM elements for location
+        const mainBtn = document.getElementById('main-btn');
+        const locationHint = document.getElementById('location-hint');
+        
+        // Handle main button click
+        function handleMainButtonClick() {
+            if (userLocation.granted) {
+                openLoveOverlay();
+            } else {
+                requestLocation();
+            }
+        }
+        
+        // Request user location
+        function requestLocation() {
+            if (!navigator.geolocation) {
+                locationHint.textContent = 'Geolocation not supported by your browser';
+                return;
+            }
+            
+            mainBtn.disabled = true;
+            mainBtn.textContent = 'Getting location...';
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userLocation.latitude = position.coords.latitude;
+                    userLocation.longitude = position.coords.longitude;
+                    userLocation.granted = true;
+                    
+                    // Update button to Start Swiping
+                    mainBtn.disabled = false;
+                    mainBtn.textContent = 'Start Swiping';
+                    
+                    // Update hint to show location enabled
+                    locationHint.textContent = 'Location access enabled';
+                    locationHint.classList.add('enabled');
+                    
+                    // Fetch real nearby restaurants
+                    fetchNearbyRestaurants();
+                },
+                (error) => {
+                    mainBtn.disabled = false;
+                    mainBtn.textContent = 'Enable Location';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            locationHint.textContent = 'Location permission denied. Please enable in browser settings.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            locationHint.textContent = 'Location unavailable. Please try again.';
+                            break;
+                        case error.TIMEOUT:
+                            locationText.textContent = 'Location request timed out';
+                            break;
+                        default:
+                            locationText.textContent = 'Unknown location error';
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+        
+        // Foursquare API Configuration
+        // Get your free API key at: https://foursquare.com/developers/signup
+        const FOURSQUARE_API_KEY = 'fsq3SZFCH4A22HH0B0MO1E55LUP4P5RL5QLRDYCFCKDU3M5CXAY2';
+        
+        // Fetch nearby restaurants using Foursquare Places API
+        async function fetchNearbyRestaurants() {
+            const radiusSelect = document.getElementById('radius-select');
+            const radiusMiles = parseFloat(radiusSelect?.value || 1);
+            const radiusMeters = Math.round(radiusMiles * 1609.34);
+            
+            if (!FOURSQUARE_API_KEY) {
+                console.log('No Foursquare API key configured. Using sample data.');
+                console.log(`Would fetch restaurants within ${radiusMiles} miles of (${userLocation.latitude}, ${userLocation.longitude})`);
+                return;
+            }
+            
+            try {
+                locationHint.textContent = 'Finding nearby restaurants...';
+                
+                // Fetch nearby restaurants from Foursquare
+                const searchResponse = await fetch(
+                    `https://api.foursquare.com/v3/places/search?ll=${userLocation.latitude},${userLocation.longitude}&radius=${radiusMeters}&categories=13065&limit=20&fields=fsq_id,name,categories,location,rating,hours,photos,price`,
+                    {
+                        headers: {
+                            'Authorization': FOURSQUARE_API_KEY,
+                            'Accept': 'application/json'
+                        }
+                    }
+                );
+                
+                if (!searchResponse.ok) {
+                    throw new Error('Failed to fetch restaurants');
+                }
+                
+                const data = await searchResponse.json();
+                
+                if (data.results && data.results.length > 0) {
+                    // Transform Foursquare data to our format
+                    const realRestaurants = await Promise.all(
+                        data.results.map(async (place) => {
+                            // Fetch photos for each place
+                            let images = [];
+                            try {
+                                const photosResponse = await fetch(
+                                    `https://api.foursquare.com/v3/places/${place.fsq_id}/photos?limit=5`,
+                                    {
+                                        headers: {
+                                            'Authorization': FOURSQUARE_API_KEY,
+                                            'Accept': 'application/json'
+                                        }
+                                    }
+                                );
+                                if (photosResponse.ok) {
+                                    const photosData = await photosResponse.json();
+                                    images = photosData.map(photo => ({
+                                        url: `${photo.prefix}original${photo.suffix}`,
+                                        restaurant: place.name
+                                    }));
+                                }
+                            } catch (e) {
+                                console.log(`Could not fetch photos for ${place.name}`);
+                            }
+                            
+                            // Use placeholder if no photos available
+                            if (images.length === 0) {
+                                images = [{
+                                    url: `https://source.unsplash.com/400x500/?${encodeURIComponent(place.categories?.[0]?.name || 'restaurant')},food`,
+                                    restaurant: place.name
+                                }];
+                            }
+                            
+                            return {
+                                name: place.name,
+                                type: place.categories?.[0]?.name || 'Restaurant',
+                                price: place.price ? '$'.repeat(place.price) : '$$',
+                                rating: place.rating ? (place.rating / 2).toFixed(1) : '4.0',
+                                reviews: Math.floor(Math.random() * 500) + 50,
+                                status: place.hours?.open_now ? 'Open' : 'Closed',
+                                hours: place.hours?.display || 'Hours vary',
+                                overview: `${place.name} is a local ${place.categories?.[0]?.name?.toLowerCase() || 'restaurant'} located at ${place.location?.formatted_address || 'this location'}.`,
+                                images: images
+                            };
+                        })
+                    );
+                    
+                    // Filter restaurants that have at least one image
+                    const restaurantsWithImages = realRestaurants.filter(r => r.images.length > 0);
+                    
+                    if (restaurantsWithImages.length > 0) {
+                        restaurantData = restaurantsWithImages;
+                        console.log(`Loaded ${restaurantsWithImages.length} real restaurants with images`);
+                        locationHint.textContent = `Found ${restaurantsWithImages.length} restaurants nearby`;
+                    }
+                } else {
+                    locationHint.textContent = 'No restaurants found nearby. Using sample data.';
+                }
+            } catch (error) {
+                console.error('Error fetching restaurants:', error);
+                locationHint.textContent = 'Location access enabled';
+            }
+            
+            locationHint.classList.add('enabled');
+        }
+        
+        // Sample restaurant data with food images (will be replaced by API data in production)
+        let restaurantData = [
+            {
+                name: "Bella Italia",
+                type: "Italian Restaurant",
+                price: "$$",
+                rating: 4.7,
+                reviews: 328,
+                status: "Open",
+                hours: "Closes at 10pm",
+                overview: "Authentic Italian cuisine in a cozy setting. Known for handmade pasta and wood-fired pizzas that transport you straight to Naples.",
+                images: [
+                    "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&h=150&fit=crop"
+                ],
+                foodImages: [
+                    "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=500&fit=crop"
+                ]
+            },
+            {
+                name: "Sakura Sushi",
+                type: "Japanese Restaurant",
+                price: "$$$",
+                rating: 4.9,
+                reviews: 512,
+                status: "Open",
+                hours: "Closes at 11pm",
+                overview: "Premium sushi and sashimi crafted by master chefs. Fresh fish flown in daily from Tokyo's famous Tsukiji market.",
+                images: [
+                    "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=200&h=150&fit=crop"
+                ],
+                foodImages: [
+                    "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=400&h=500&fit=crop"
+                ]
+            },
+            {
+                name: "The Burger Joint",
+                type: "American Grill",
+                price: "$$",
+                rating: 4.5,
+                reviews: 891,
+                status: "Open",
+                hours: "Closes at 12am",
+                overview: "Gourmet burgers made with premium Angus beef, craft beers on tap, and the most amazing loaded fries you've ever tasted.",
+                images: [
+                    "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=200&h=150&fit=crop"
+                ],
+                foodImages: [
+                    "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400&h=500&fit=crop"
+                ]
+            },
+            {
+                name: "Taco Loco",
+                type: "Mexican Cantina",
+                price: "$",
+                rating: 4.6,
+                reviews: 445,
+                status: "Open",
+                hours: "Closes at 11pm",
+                overview: "Authentic street tacos and fresh margaritas. Family recipes passed down for generations, made with love daily.",
+                images: [
+                    "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=200&h=150&fit=crop"
+                ],
+                foodImages: [
+                    "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400&h=500&fit=crop"
+                ]
+            },
+            {
+                name: "Golden Dragon",
+                type: "Chinese Restaurant",
+                price: "$$",
+                rating: 4.4,
+                reviews: 267,
+                status: "Open",
+                hours: "Closes at 10:30pm",
+                overview: "Traditional Szechuan and Cantonese dishes prepared by award-winning chefs. Famous for dim sum brunch on weekends.",
+                images: [
+                    "https://images.unsplash.com/photo-1525755662778-989d0524087e?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=200&h=150&fit=crop"
+                ],
+                foodImages: [
+                    "https://images.unsplash.com/photo-1525755662778-989d0524087e?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400&h=500&fit=crop"
+                ]
+            },
+            {
+                name: "Café Parisien",
+                type: "French Bistro",
+                price: "$$$",
+                rating: 4.8,
+                reviews: 189,
+                status: "Open",
+                hours: "Closes at 9pm",
+                overview: "Elegant French cuisine with a modern twist. Perfect for romantic dinners, special occasions, or a refined brunch experience.",
+                images: [
+                    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=150&fit=crop"
+                ],
+                foodImages: [
+                    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=500&fit=crop",
+                    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=500&fit=crop"
+                ]
+            }
+        ];
+        
+        // All food images for swiping
+        const allFoodImages = [
+            { url: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=500&fit=crop", cuisine: "american", restaurant: 2 },
+            { url: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=500&fit=crop", cuisine: "italian", restaurant: 0 },
+            { url: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&h=500&fit=crop", cuisine: "japanese", restaurant: 1 },
+            { url: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=500&fit=crop", cuisine: "mexican", restaurant: 3 },
+            { url: "https://images.unsplash.com/photo-1525755662778-989d0524087e?w=400&h=500&fit=crop", cuisine: "chinese", restaurant: 4 },
+            { url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=500&fit=crop", cuisine: "french", restaurant: 5 },
+            { url: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=500&fit=crop", cuisine: "italian", restaurant: 0 },
+            { url: "https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=400&h=500&fit=crop", cuisine: "japanese", restaurant: 1 },
+            { url: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400&h=500&fit=crop", cuisine: "american", restaurant: 2 },
+            { url: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400&h=500&fit=crop", cuisine: "mexican", restaurant: 3 },
+            { url: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400&h=500&fit=crop", cuisine: "chinese", restaurant: 4 },
+            { url: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=500&fit=crop", cuisine: "french", restaurant: 5 },
+            { url: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=500&fit=crop", cuisine: "italian", restaurant: 0 },
+            { url: "https://images.unsplash.com/photo-1553621042-f6e147245754?w=400&h=500&fit=crop", cuisine: "japanese", restaurant: 1 },
+            { url: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=500&fit=crop", cuisine: "american", restaurant: 2 },
+            { url: "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=400&h=500&fit=crop", cuisine: "mexican", restaurant: 3 },
+            { url: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=400&h=500&fit=crop", cuisine: "chinese", restaurant: 4 },
+            { url: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=500&fit=crop", cuisine: "french", restaurant: 5 },
+            { url: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=500&fit=crop", cuisine: "italian", restaurant: 0 },
+            { url: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&h=500&fit=crop", cuisine: "japanese", restaurant: 1 },
+            { url: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400&h=500&fit=crop", cuisine: "american", restaurant: 2 },
+            { url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=500&fit=crop", cuisine: "mexican", restaurant: 3 },
+            { url: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=400&h=500&fit=crop", cuisine: "chinese", restaurant: 4 },
+            { url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=500&fit=crop", cuisine: "french", restaurant: 5 }
+        ];
+        
+        // State
+        let loveState = {
+            currentIndex: 0,
+            likes: [],
+            dislikes: [],
+            shuffledImages: [],
+            isAnimating: false
+        };
+        
+        // DOM elements
+        const loveOverlay = document.getElementById('love-overlay');
+        const swipeScreen = document.getElementById('swipe-screen');
+        const matchScreen = document.getElementById('match-screen');
+        const swipeCard = document.getElementById('swipe-card');
+        const foodImage = document.getElementById('food-image');
+        const footerProgressBar = document.getElementById('footer-progress-bar');
+        
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        // Generate images prioritized by restaurant rating with minimal repetition
+        function generatePrioritizedImages(count) {
+            // Sort restaurants by rating (highest first)
+            const sortedRestaurants = [...restaurantData].sort((a, b) => b.rating - a.rating);
+            
+            // Create weighted image pool - higher rated restaurants get more representation
+            const weightedImages = [];
+            sortedRestaurants.forEach((restaurant, sortIndex) => {
+                const restIndex = restaurantData.indexOf(restaurant);
+                // Higher rated restaurants get more copies (weight based on position)
+                const weight = Math.max(1, sortedRestaurants.length - sortIndex);
+                
+                // Get images for this restaurant from allFoodImages
+                const restaurantImages = allFoodImages.filter(img => img.restaurant === restIndex);
+                
+                // Add weighted copies
+                for (let w = 0; w < weight; w++) {
+                    restaurantImages.forEach(img => {
+                        weightedImages.push({ ...img, rating: restaurant.rating });
+                    });
+                }
+            });
+            
+            // Shuffle the weighted pool
+            const shuffled = shuffleArray(weightedImages);
+            
+            // Select images while minimizing consecutive same-restaurant images
+            const result = [];
+            const used = new Set();
+            let lastRestaurant = -1;
+            
+            for (const img of shuffled) {
+                if (result.length >= count) break;
+                
+                // Try to avoid same restaurant twice in a row
+                const imgKey = img.url;
+                if (!used.has(imgKey) || result.length > allFoodImages.length) {
+                    // Prefer different restaurant than last
+                    if (img.restaurant !== lastRestaurant || result.length >= count - 5) {
+                        result.push(img);
+                        used.add(imgKey);
+                        lastRestaurant = img.restaurant;
+                    }
+                }
+            }
+            
+            // If we don't have enough, fill with remaining shuffled images
+            if (result.length < count) {
+                for (const img of shuffled) {
+                    if (result.length >= count) break;
+                    if (!result.includes(img)) {
+                        result.push(img);
+                    }
+                }
+            }
+            
+            return result.slice(0, count);
+        }
+        
+        function openLoveOverlay() {
+            // Reset state
+            loveState = {
+                currentIndex: 0,
+                likes: [],
+                dislikes: [],
+                shuffledImages: generatePrioritizedImages(20),
+                isAnimating: false
+            };
+            
+            // Show overlay
+            loveOverlay.classList.remove('hidden');
+            swipeScreen.classList.remove('hidden');
+            matchScreen.classList.add('hidden');
+            
+            // Load first image
+            loadCurrentImage();
+            updateProgress();
+        }
+        
+        function closeLoveOverlay() {
+            loveOverlay.classList.add('hidden');
+        }
+        
+        function loadCurrentImage() {
+            if (loveState.currentIndex < loveState.shuffledImages.length) {
+                const imageData = loveState.shuffledImages[loveState.currentIndex];
+                foodImage.src = imageData.url;
+                swipeCard.classList.remove('swiped-left', 'swiped-right', 'swiping-left', 'swiping-right');
+                swipeCard.style.transform = '';
+                swipeCard.style.opacity = '1';
+            }
+        }
+        
+        function updateProgress() {
+            const total = loveState.likes.length + loveState.dislikes.length;
+            const percentage = (total / 20 * 100) + '%';
+            footerProgressBar.style.width = percentage;
+        }
+        
+        function handleLike() {
+            if (loveState.isAnimating || loveState.currentIndex >= loveState.shuffledImages.length) return;
+            
+            loveState.isAnimating = true;
+            const imageData = loveState.shuffledImages[loveState.currentIndex];
+            loveState.likes.push(imageData);
+            
+            // Animate swipe right
+            swipeCard.classList.add('swiping-right');
+            setTimeout(() => {
+                swipeCard.classList.add('swiped-right');
+            }, 100);
+            
+            setTimeout(() => {
+                loveState.currentIndex++;
+                updateProgress();
+                
+                if (loveState.likes.length + loveState.dislikes.length >= 20) {
+                    showMatch();
+                } else {
+                    loadCurrentImage();
+                }
+                loveState.isAnimating = false;
+            }, 400);
+        }
+        
+        function handleDislike() {
+            if (loveState.isAnimating || loveState.currentIndex >= loveState.shuffledImages.length) return;
+            
+            loveState.isAnimating = true;
+            const imageData = loveState.shuffledImages[loveState.currentIndex];
+            loveState.dislikes.push(imageData);
+            
+            // Animate swipe left
+            swipeCard.classList.add('swiping-left');
+            setTimeout(() => {
+                swipeCard.classList.add('swiped-left');
+            }, 100);
+            
+            setTimeout(() => {
+                loveState.currentIndex++;
+                updateProgress();
+                
+                if (loveState.likes.length + loveState.dislikes.length >= 20) {
+                    showMatch();
+                } else {
+                    loadCurrentImage();
+                }
+                loveState.isAnimating = false;
+            }, 400);
+        }
+        
+        function showMatch() {
+            // Determine best restaurant based on likes
+            const restaurantScores = {};
+            loveState.likes.forEach(img => {
+                const restIndex = img.restaurant;
+                restaurantScores[restIndex] = (restaurantScores[restIndex] || 0) + 1;
+            });
+            
+            // Find restaurant with most likes
+            let bestRestaurant;
+            if (Object.keys(restaurantScores).length > 0) {
+                const sortedRestaurants = Object.entries(restaurantScores).sort((a, b) => b[1] - a[1]);
+                bestRestaurant = restaurantData[sortedRestaurants[0][0]];
+            } else {
+                bestRestaurant = restaurantData[Math.floor(Math.random() * restaurantData.length)];
+            }
+            
+            // Populate match screen
+            document.getElementById('restaurant-name').textContent = bestRestaurant.name;
+            document.getElementById('restaurant-type').textContent = `${bestRestaurant.type} • ${bestRestaurant.price}`;
+            document.getElementById('restaurant-rating').textContent = bestRestaurant.rating;
+            document.getElementById('restaurant-reviews').textContent = `${bestRestaurant.reviews} reviews`;
+            document.getElementById('restaurant-status').textContent = bestRestaurant.status;
+            document.getElementById('restaurant-hours').textContent = bestRestaurant.hours;
+            document.getElementById('restaurant-overview').textContent = bestRestaurant.overview;
+            checkOverviewNeedsExpansion();
+            document.getElementById('restaurant-main-img').src = bestRestaurant.images[0];
+            document.getElementById('restaurant-img-2').src = bestRestaurant.images[1];
+            
+            // Generate personalized message
+            const cuisineType = bestRestaurant.type.split(' ')[0];
+            document.getElementById('match-message').textContent = 
+                `Based on your likes, you're craving some ${cuisineType.toLowerCase()} flavors! We saved the rest in your favorites.`;
+            
+            // Switch screens
+            swipeScreen.classList.add('hidden');
+            matchScreen.classList.remove('hidden');
+            matchScreen.style.animation = 'slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        }
+        
+        function goToListing() {
+            alert('🍽️ This would navigate to the restaurant listing on the partner site!');
+            closeLoveOverlay();
+        }
+        
+        function keepPlaying() {
+            openLoveOverlay();
+        }
+        
+        function toggleOverview() {
+            const section = document.getElementById('overview-section');
+            if (section.classList.contains('needs-expansion')) {
+                section.classList.toggle('expanded');
+            }
+        }
+        
+        function checkOverviewNeedsExpansion() {
+            const overviewText = document.getElementById('restaurant-overview');
+            const section = document.getElementById('overview-section');
+            
+            // Get line height and calculate if text exceeds 3 lines
+            const lineHeight = parseFloat(getComputedStyle(overviewText).lineHeight);
+            const maxHeight = lineHeight * 3;
+            
+            if (overviewText.scrollHeight > maxHeight + 5) {
+                section.classList.add('needs-expansion');
+            } else {
+                section.classList.remove('needs-expansion');
+                section.classList.remove('expanded');
+            }
+        }
+        
+        // Touch/swipe support
+        let touchStartX = 0;
+        let touchCurrentX = 0;
+        let isDragging = false;
+        
+        swipeCard.addEventListener('touchstart', (e) => {
+            if (loveState.isAnimating) return;
+            touchStartX = e.touches[0].clientX;
+            isDragging = true;
+        });
+        
+        swipeCard.addEventListener('touchmove', (e) => {
+            if (!isDragging || loveState.isAnimating) return;
+            touchCurrentX = e.touches[0].clientX;
+            const diffX = touchCurrentX - touchStartX;
+            
+            const rotation = diffX * 0.1;
+            swipeCard.style.transform = `translateX(${diffX}px) rotate(${rotation}deg)`;
+            
+            if (diffX > 50) {
+                swipeCard.classList.add('swiping-right');
+                swipeCard.classList.remove('swiping-left');
+            } else if (diffX < -50) {
+                swipeCard.classList.add('swiping-left');
+                swipeCard.classList.remove('swiping-right');
+            } else {
+                swipeCard.classList.remove('swiping-left', 'swiping-right');
+            }
+        });
+        
+        swipeCard.addEventListener('touchend', () => {
+            if (!isDragging || loveState.isAnimating) return;
+            isDragging = false;
+            
+            const diffX = touchCurrentX - touchStartX;
+            
+            if (diffX > 100) {
+                handleLike();
+            } else if (diffX < -100) {
+                handleDislike();
+            } else {
+                swipeCard.style.transform = '';
+                swipeCard.classList.remove('swiping-left', 'swiping-right');
+            }
+        });
+        
+        // Mouse support
+        swipeCard.addEventListener('mousedown', (e) => {
+            if (loveState.isAnimating) return;
+            touchStartX = e.clientX;
+            isDragging = true;
+            swipeCard.style.cursor = 'grabbing';
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || loveState.isAnimating) return;
+            touchCurrentX = e.clientX;
+            const diffX = touchCurrentX - touchStartX;
+            
+            const rotation = diffX * 0.1;
+            swipeCard.style.transform = `translateX(${diffX}px) rotate(${rotation}deg)`;
+            
+            if (diffX > 50) {
+                swipeCard.classList.add('swiping-right');
+                swipeCard.classList.remove('swiping-left');
+            } else if (diffX < -50) {
+                swipeCard.classList.add('swiping-left');
+                swipeCard.classList.remove('swiping-right');
+            } else {
+                swipeCard.classList.remove('swiping-left', 'swiping-right');
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (!isDragging || loveState.isAnimating) return;
+            isDragging = false;
+            swipeCard.style.cursor = 'grab';
+            
+            const diffX = touchCurrentX - touchStartX;
+            
+            if (diffX > 100) {
+                handleLike();
+            } else if (diffX < -100) {
+                handleDislike();
+            } else {
+                swipeCard.style.transform = '';
+                swipeCard.classList.remove('swiping-left', 'swiping-right');
+            }
+        });
+        
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (loveOverlay.classList.contains('hidden')) return;
+            
+            if (e.key === 'ArrowLeft') {
+                handleDislike();
+            } else if (e.key === 'ArrowRight') {
+                handleLike();
+            } else if (e.key === 'Escape') {
+                closeLoveOverlay();
+            }
+        });
+        
+        // Re-fetch restaurants when radius changes
+        document.getElementById('radius-select').addEventListener('change', () => {
+            if (userLocation.granted) {
+                fetchNearbyRestaurants();
+            }
+        });
+        
+        // Check if location was previously granted (page refresh)
+        if (navigator.permissions) {
+            navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+                if (result.state === 'granted') {
+                    requestLocation();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
