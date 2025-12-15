@@ -520,33 +520,29 @@
         
         .map-preview {
             flex: 1;
-            background: linear-gradient(135deg, #e8f4f8 0%, #d4edda 100%);
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             min-height: 60px;
             position: relative;
             overflow: hidden;
         }
         
-        .map-preview::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: 
-                linear-gradient(90deg, transparent 49%, #ccc 49%, #ccc 51%, transparent 51%),
-                linear-gradient(0deg, transparent 49%, #ccc 49%, #ccc 51%, transparent 51%);
-            background-size: 30px 30px;
-            opacity: 0.3;
+        .map-preview img.static-map {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
         }
         
         .map-pin {
-            width: 28px;
-            height: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 22px;
+            height: 29px;
             z-index: 1;
             animation: bounce 1s infinite;
+            object-fit: contain;
         }
         
         @keyframes bounce {
@@ -829,7 +825,7 @@
                         <div class="side-images">
                             <img id="restaurant-img-2" src="" alt="Restaurant food">
                             <div class="map-preview">
-                                <img src=" mappin.svg" alt="Location" class="map-pin">
+                                <img src="map.png" alt="Map" class="static-map" id="static-map">
                             </div>
                         </div>
                     </div>
@@ -1323,10 +1319,10 @@
             const imageData = loveState.shuffledImages[loveState.currentIndex];
             loveState.likes.push(imageData);
             
-            // Animate swipe right
-            swipeCard.classList.add('swiping-right');
+            // Animate swipe left (like)
+            swipeCard.classList.add('swiping-left');
             setTimeout(() => {
-                swipeCard.classList.add('swiped-right');
+                swipeCard.classList.add('swiped-left');
             }, 100);
             
             setTimeout(() => {
@@ -1349,10 +1345,10 @@
             const imageData = loveState.shuffledImages[loveState.currentIndex];
             loveState.dislikes.push(imageData);
             
-            // Animate swipe left
-            swipeCard.classList.add('swiping-left');
+            // Animate swipe right (dislike)
+            swipeCard.classList.add('swiping-right');
             setTimeout(() => {
-                swipeCard.classList.add('swiped-left');
+                swipeCard.classList.add('swiped-right');
             }, 100);
             
             setTimeout(() => {
@@ -1476,9 +1472,9 @@
             
             const diffX = touchCurrentX - touchStartX;
             
-            if (diffX > 100) {
+            if (diffX < -100) {
                 handleLike();
-            } else if (diffX < -100) {
+            } else if (diffX > 100) {
                 handleDislike();
             } else {
                 swipeCard.style.transform = '';
@@ -1520,9 +1516,9 @@
             
             const diffX = touchCurrentX - touchStartX;
             
-            if (diffX > 100) {
+            if (diffX < -100) {
                 handleLike();
-            } else if (diffX < -100) {
+            } else if (diffX > 100) {
                 handleDislike();
             } else {
                 swipeCard.style.transform = '';
@@ -1535,9 +1531,9 @@
             if (loveOverlay.classList.contains('hidden')) return;
             
             if (e.key === 'ArrowLeft') {
-                handleDislike();
-            } else if (e.key === 'ArrowRight') {
                 handleLike();
+            } else if (e.key === 'ArrowRight') {
+                handleDislike();
             } else if (e.key === 'Escape') {
                 closeLoveOverlay();
             }
